@@ -1,27 +1,24 @@
-const Mastodon = require('@lagunehq/core');
+const assert = require('assert')
+const Mastodon = require('@lagunehq/core')
 
-const {INSTANCE_DOMAIN, ACCESS_TOKEN} = process.env
+const {MWB_INSTANCE_DOMAIN, MWB_ACCESS_TOKEN, MWB_MESSAGE} = process.env
 
-if (!INSTANCE_DOMAIN) {
-	throw new Error('INSTANCE_DOMAIN environment var is missing')
-}
-
-if (!ACCESS_TOKEN) {
-	throw new Error('ACCESS_TOKEN environment var is missing')
-}
+assert(MWB_INSTANCE_DOMAIN, 'MWB_INSTANCE_DOMAIN environment var is required')
+assert(MWB_ACCESS_TOKEN, 'MWB_ACCESS_TOKEN environment var is required')
+assert(MWB_MESSAGE, 'MWB_MESSAGE environment var is required')
 
 const client = new Mastodon.default()
 
-client.setUrl(`https://${INSTANCE_DOMAIN}`)
-client.setStreamingUrl(`wss://${INSTANCE_DOMAIN}`)
-client.setToken(ACCESS_TOKEN)
+client.setUrl(`https://${MWB_INSTANCE_DOMAIN}`)
+client.setStreamingUrl(`wss://${MWB_INSTANCE_DOMAIN}`)
+client.setToken(MWB_ACCESS_TOKEN)
 
 client.stream('user', message => {
 	if (message.event === 'notification') {
 		const notification = JSON.parse(message.payload);
 
 		if (notification.type === 'follow') {
-			client.createStatus(`Welcome @${notification.account.acct} !`, {
+			client.createStatus(`@${notification.account.acct} ${MWB_MESSAGE}`, {
 				visibility: 'direct'
 			})
 		}
