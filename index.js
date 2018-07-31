@@ -17,7 +17,7 @@ client.stream('user', message => {
 	if (message.event === 'notification') {
 		const notification = JSON.parse(message.payload);
 
-		if (notification.type === 'follow') {
+		if (notification.type === 'follow' && notification.account.statuses_count === 0) {
 			client.createStatus(`@${notification.account.acct} ${MWB_MESSAGE}`, {
 				visibility: 'direct'
 			})
